@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, ListRenderItem } from 'react-native';
-import { Calendar } from 'react-native-calendars';
+import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, NavigationProp, useIsFocused } from '@react-navigation/native';
-import { getAllAgendamentos } from '../database/database'; // importa sua função que lê do SQLite
+import { getAllAgendamentos } from '../database/database';
 
 type RootStackParamList = {
   AgendamentoForm: undefined;
@@ -16,6 +16,26 @@ type Agendamento = {
   horario: string;
   data: string;
 };
+
+LocaleConfig.locales['pt'] = {
+  monthNames: [
+    'Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+    'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'
+  ],
+  monthNamesShort: [
+    'Jan','Fev','Mar','Abr','Mai','Jun',
+    'Jul','Ago','Set','Out','Nov','Dez'
+  ],
+  dayNames: [
+    'Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'
+  ],
+  dayNamesShort: [
+    'Dom','Seg','Ter','Qua','Qui','Sex','Sáb'
+  ],
+  today: 'Hoje'
+};
+
+LocaleConfig.defaultLocale = 'pt';
 
 export default function AgendaScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
