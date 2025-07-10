@@ -21,7 +21,7 @@ export async function createTableServices() {
   );
 }
 
-export async function insert(table, campos) {
+export async function insert(table: string, campos: any) {
   const db = await openDb();
   
   const columns = campos.map(c => c.name).join(', ');
@@ -37,5 +37,24 @@ export async function insert(table, campos) {
 export async function getAllServices() {
   const db = await openDb();
   const result = await db.getAllAsync('SELECT * FROM services');
+  return result;
+}
+
+export async function createTableAgendamentos() {
+  const db = await openDb();
+  await db.execAsync(
+    `CREATE TABLE IF NOT EXISTS agendamentos (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      cliente TEXT NOT NULL,
+      servico TEXT NOT NULL,
+      data TEXT NOT NULL,
+      horario TEXT NOT NULL
+    );`
+  );
+}
+
+export async function getAllAgendamentos() {
+  const db = await openDb();
+  const result = await db.getAllAsync('SELECT * FROM agendamentos');
   return result;
 }

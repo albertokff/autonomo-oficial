@@ -1,29 +1,55 @@
-// screens/AgendaScreen.js
-import React, { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ListRenderItem } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, NavigationProp, useIsFocused } from '@react-navigation/native';
+import { getAllAgendamentos } from '../database/database'; // importa sua função que lê do SQLite
+
+type RootStackParamList = {
+  AgendamentoForm: undefined;
+};
+
+type Agendamento = {
+  id: string;
+  cliente: string;
+  servico: string;
+  horario: string;
+  data: string;
+};
 
 export default function AgendaScreen() {
-  const navigation = useNavigation();
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const isFocused = useIsFocused();
+  
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
 
-  // Mock de agendamentos
-  const agendamentos = [
-    { id: '1', cliente: 'Maria', servico: 'Corte', horario: '14:00', data: '2025-07-07' },
-    { id: '2', cliente: 'João', servico: 'Barba', horario: '15:00', data: '2025-07-07' },
-  ];
+  useEffect(() => {
+    if (isFocused) {
+      getAllAgendamentos().then((dados) => {
+        setAgendamentos(dados);
+      }).catch(e => console.log('Erro ao buscar agendamentos:', e));
+    }
+  }, [isFocused]);
 
   const agendamentosFiltrados = agendamentos.filter(a => a.data === selectedDate);
+
+  const markedDates = agendamentos.reduce((acc, ag) => {
+    acc[ag.data] = acc[ag.data] || { marked: true, dotColor: '#2e7d32' };
+    return acc;
+  }, { [selectedDate]: { selected: true, selectedColor: '#2e7d32' } } as Record<string, any>);
+
+  const renderItem: ListRenderItem<Agendamento> = ({ item }) => (
+    <View style={styles.agendamentoItem}>
+      <Text style={styles.agendamentoText}>{item.horario} - {item.cliente} ({item.servico})</Text>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
       <Calendar
         onDayPress={(day) => setSelectedDate(day.dateString)}
-        markedDates={{
-          [selectedDate]: { selected: true, selectedColor: '#2e7d32' }
-        }}
+        markedDates={markedDates}
       />
       <Text style={styles.title}>Agendamentos para {selectedDate.split('-').reverse().join('/')}</Text>
       {agendamentosFiltrados.length === 0 ? (
@@ -32,11 +58,7 @@ export default function AgendaScreen() {
         <FlatList
           data={agendamentosFiltrados}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.agendamentoItem}>
-              <Text style={styles.agendamentoText}>{item.horario} - {item.cliente} ({item.servico})</Text>
-            </View>
-          )}
+          renderItem={renderItem}
         />
       )}
 

@@ -1,14 +1,14 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import {
-  View,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
+  View,
 } from 'react-native';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../context/AgendamentoContext';
 
 export default function LoginScreen() {
   const { login } = useContext(AuthContext);
