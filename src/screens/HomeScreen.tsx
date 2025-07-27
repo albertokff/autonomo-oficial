@@ -1,5 +1,5 @@
-import { useNavigation } from '@react-navigation/native';
-import React, { useEffect, useRef, useState } from 'react';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Dimensions,
@@ -12,6 +12,7 @@ import {
   View,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { getResumoMensal } from '../database/database';
 
 const { width } = Dimensions.get('window');
 
@@ -24,12 +25,6 @@ const feelings: Feeling[] = [
   { emoji: '😐', label: 'Neutro' },
   { emoji: '😞', label: 'Triste' },
   { emoji: '😡', label: 'Irritado' },
-];
-
-const dashboardCards: DashboardCard[] = [
-  { label: 'Agenda', value: '12' },
-  { label: 'Atendidos', value: '5' },
-  { label: 'Faturamento', value: 'R$ 2.340,00' },
 ];
 
 const mainActions: Action[] = [
@@ -51,11 +46,29 @@ const extraActions: Action[] = [
   { label: 'Ajuda', icon: 'help-outline' },
 ];
 
+async function fetchDashboardData(): Promise<{ agenda: number; atendidos: number; faturamento: number }> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        agenda: 1,
+        atendidos: 7,
+        faturamento: 3250.5,
+      });
+    }, 1000);
+  });
+}
+
 export default function HomeScreen() {
   const navigation = useNavigation<any>();
   const [selectedFeeling, setSelectedFeeling] = useState<Feeling | null>(null);
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const slideAnim = useRef(new Animated.Value(-width)).current;
+
+  const [dashboardCards, setDashboardCards] = useState<DashboardCard[]>([
+    { label: 'Agenda', value: '...' },
+    { label: 'Atendidos', value: '...' },
+    { label: 'Faturamento', value: '...' },
+  ]);
 
   useEffect(() => {
     Animated.timing(slideAnim, {
@@ -65,6 +78,23 @@ export default function HomeScreen() {
     }).start();
   }, [sidebarVisible, slideAnim]);
 
+  useFocusEffect(
+    useCallback(() => {
+      async function loadDashboard() {
+        try {
+          const data = await getResumoMensal();
+          setDashboardCards([
+            { label: 'Agenda', value: data.totalMes.toString() },
+            { label: 'Atendidos', value: data.feitosMes.toString() },
+            { label: 'Faturamento', value: `R$ ${data.faturamentoTotal.toFixed(2).replace('.', ',')}` },
+          ]);
+        } catch (error) {
+          console.error('Erro ao carregar dados do dashboard:', error);
+        }
+      }
+      loadDashboard();
+  }, []));
+
   const closeSidebar = () => setSidebarVisible(false);
 
   const handleOverlayPress = (e: GestureResponderEvent) => {
@@ -72,6 +102,10 @@ export default function HomeScreen() {
       closeSidebar();
     }
   };
+
+  function logout() {
+    alert('Logout acionado');
+  }
 
   return (
     <View style={styles.container}>
@@ -174,7 +208,7 @@ export default function HomeScreen() {
         <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={handleOverlayPress}>
           <Animated.View style={[styles.sidebar, { left: slideAnim }]}>
             <Text style={styles.sidebarTitle}>Menu</Text>
-            {/* ... (mesmos itens do menu) */}
+            {/* Aqui você pode adicionar itens do menu */}
             <TouchableOpacity
               style={[styles.sidebarItem, styles.logoutSidebar]}
               onPress={() => {
@@ -192,7 +226,6 @@ export default function HomeScreen() {
   );
 }
 
-// styles (mantém os mesmos)
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   header: {
@@ -252,12 +285,19 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     width: width * 0.75,
-    backgroundColor: '#fff',
-    paddingTop: 50,
-    paddingHorizontal: 20,
+    backgroundColor: '#2e7d32',
+    padding: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 8,
   },
-  sidebarTitle: { fontSize: 22, fontWeight: '600', marginBottom: 20, color: '#2e7d32' },
-  sidebarItem: { paddingVertical: 12 },
-  sidebarText: { fontSize: 16, color: '#2e7d32' },
-  logoutSidebar: { backgroundColor: '#2e7d32', marginTop: 20, borderRadius: 8, alignItems: 'center' },
+  sidebarTitle: { fontSize: 22, fontWeight: '700', color: '#fff', marginBottom: 20 },
+  sidebarItem: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#4caf50',
+  },
+  sidebarText: { fontSize: 18 },
+  logoutSidebar: { marginTop: 30, backgroundColor: '#d32f2f', borderRadius: 8, paddingVertical: 10, alignItems: 'center' },
 });

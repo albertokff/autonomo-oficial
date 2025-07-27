@@ -113,3 +113,36 @@ export const marcarAgendamentoComoFeito = async (id: string) => {
     console.error('Erro ao marcar como feito:', error);
   }
 };
+
+export const getResumoMensal = async () => {
+  const db = await openDb();
+  const agora = new Date();
+  const mes = agora.getMonth() + 1;
+  const ano = agora.getFullYear();
+  const mesFormatado = mes < 10 ? `0${mes}` : mes.toString();
+  const inicio = `${ano}-${mesFormatado}-01`;
+  const fim = `${ano}-${mesFormatado}-31`;
+
+  try {
+    const result = await db.getAllAsync(
+      `SELECT * FROM agendamentos WHERE data BETWEEN ? AND ?`,
+      [inicio, fim]
+    );
+
+    const totalMes = result.length;
+    const feitosMes = result.filter((item) => item.feito === 1 || item.feito === '1').length;
+
+    console.log(totalMes)
+
+    const faturamentoTotal = result.reduce((soma, item) => soma + (item.valor || 0), 0);
+    const faturado = result
+      .filter((item) => item.feito === 1 || item.feito === '1')
+      .reduce((soma, item) => soma + (item.valor || 0), 0);
+
+    return { totalMes, feitosMes, faturamentoTotal, faturado };
+  } catch (error) {
+    console.error('Erro ao obter resumo mensal:', error);
+    return { totalMes: 0, feitosMes: 0, faturamentoTotal: 0, faturado: 0 };
+  }
+};
+

@@ -99,8 +99,6 @@ export default function AgendaScreen() {
     }
   }, [isFocused]);
 
-  console.log('Estado agendamentos:', agendamentos);
-
   const agendamentosFiltrados = agendamentos.filter(a => a.data === selectedDate);
 
   const markedDates = agendamentos.reduce((acc, ag) => {
