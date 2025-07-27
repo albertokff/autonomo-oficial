@@ -1,4 +1,5 @@
 import * as SQLite from 'expo-sqlite';
+import { Agendamento } from '../context/AgendamentoContext';
 
 let dbPromise;
 
@@ -42,19 +43,73 @@ export async function getAllServices() {
 
 export async function createTableAgendamentos() {
   const db = await openDb();
-  await db.execAsync(
-    `CREATE TABLE IF NOT EXISTS agendamentos (
+  await db.execAsync(`
+    CREATE TABLE IF NOT EXISTS agendamentos (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       cliente TEXT NOT NULL,
       servico TEXT NOT NULL,
       data TEXT NOT NULL,
       horario TEXT NOT NULL
-    );`
-  );
+    );
+  `);
 }
 
-export async function getAllAgendamentos() {
+export async function addFeitoColumnIfNotExists() {
   const db = await openDb();
-  const result = await db.getAllAsync('SELECT * FROM agendamentos');
-  return result;
+  try {
+    await db.execAsync('ALTER TABLE agendamentos ADD COLUMN feito INTEGER DEFAULT 0;');
+  } catch (error: any) {
+    if (
+      error.message.includes('duplicate column') ||
+      error.message.includes('already exists') ||
+      error.message.includes('column "feito" already exists')
+    ) {
+      // Coluna já existe, ok
+    } else {
+      throw error;
+    }
+  }
 }
+
+export async function initDatabase() {
+  await createTableAgendamentos();
+  await addFeitoColumnIfNotExists();
+}
+
+export const getAllAgendamentos = async () => {
+  const db = await openDb();
+  try {
+    const result = await db.getAllAsync('SELECT * FROM agendamentos');
+    console.log('Resultado bruto do banco:', result);
+
+    return result.map((item: any) => ({
+      ...item,
+      feito: item.feito === 1 || item.feito === '1', // força booleano
+    }));
+  } catch (error) {
+    console.log('Erro ao buscar agendamentos:', error);
+    return [];
+  }
+};
+
+
+
+export const deleteAgendamento = async (id: string) => {
+  try {
+    const db = await openDb();
+    await db.runAsync('DELETE FROM agendamentos WHERE id = ?', [id]);
+    console.log('Agendamento excluído com sucesso');
+  } catch (error) {
+    console.error('Erro ao excluir agendamento:', error);
+  }
+};
+
+export const marcarAgendamentoComoFeito = async (id: string) => {
+  try {
+    const db = await openDb();
+    await db.runAsync('UPDATE agendamentos SET feito = 1 WHERE id = ?', [id]);
+    console.log('Agendamento marcado como feito');
+  } catch (error) {
+    console.error('Erro ao marcar como feito:', error);
+  }
+};

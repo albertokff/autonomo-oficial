@@ -16,7 +16,8 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.albertokff.autonomooficial"
     },
     "web": {
       "bundler": "metro",
@@ -39,6 +40,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7e04ce37-c33a-49f3-ba51-45ca48731bf7"
+      }
     }
   }
 }
