@@ -10,22 +10,31 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
+import { useCliente } from '../context/ClienteContext';
 
 export default function ClientForm({ navigation }) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
+  const { addCliente } = useCliente()
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!name.trim()) {
       Alert.alert('Erro', 'Por favor, informe o nome do cliente.');
       return;
     }
-    // Aqui você pode enviar os dados para API ou salvar localmente
 
-    Alert.alert('Sucesso', `Cliente ${name} cadastrado com sucesso!`);
-    navigation.goBack(); // Voltar para a tela anterior
+    try {
+      await addCliente(name.trim(), phone.trim(), email.trim());
+      Alert.alert('Sucesso', `Cliente ${name} cadastrado com sucesso!`);
+      navigation.goBack();
+
+    } catch (error) {
+      console.error('Erro ao salvar cliente:', error);
+      Alert.alert('Erro', 'Não foi possível salvar o cliente.');
+    }
   };
+
 
   return (
     <KeyboardAvoidingView

@@ -93,6 +93,7 @@ export async function initDatabase() {
   await createTableAgendamentos();
   await addFeitoColumnIfNotExists();
   await addValorColumnIfNotExists();
+  await createTableClientes();
 }
 
 export const getAllAgendamentos = async () => {
@@ -164,4 +165,33 @@ export const getResumoMensal = async () => {
     return { totalMes: 0, feitosMes: 0, faturamentoTotal: 0, faturado: 0 };
   }
 };
+
+export async function getAllClientes() {
+  const db = await openDb();
+  const result = await db.getAllAsync(`SELECT * FROM clientes;`);
+  return result;
+}
+
+export async function createTableClientes() {
+  const db = await openDb();
+  await db.execAsync(`
+    CREATE TABLE IF NOT EXISTS clientes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nome TEXT NOT NULL,
+      telefone TEXT,
+      email TEXT
+    );
+  `);
+}
+
+export async function saveCliente(nome: string, telefone?: string, email?: string) {
+  const db = await openDb();
+  await db.runAsync(
+    `INSERT INTO clientes (nome, telefone, email) VALUES (?, ?, ?);`,
+    [nome, telefone ?? '', email ?? '']
+  );
+}
+
+
+
 

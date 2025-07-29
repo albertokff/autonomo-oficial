@@ -3,6 +3,9 @@ import { View, Text, TextInput, Button, StyleSheet, Platform, TouchableOpacity }
 import { useNavigation } from '@react-navigation/native';
 import { useAgendamento } from '../context/AgendamentoContext';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { Picker } from '@react-native-picker/picker';
+import { useCliente } from '../context/ClienteContext';
+
 
 export default function AgendamentoForm() {
   const navigation = useNavigation();
@@ -14,6 +17,7 @@ export default function AgendamentoForm() {
   const [horario, setHorario] = useState('');
   const [data, setData] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const { clientes } = useCliente();
 
   function handleSalvar() {
     if (!cliente || !servico || !valor || !data || !horario) {
@@ -43,7 +47,17 @@ export default function AgendamentoForm() {
   return (
     <View style={styles.container}>
       <Text>Cliente:</Text>
-      <TextInput style={styles.input} value={cliente} onChangeText={setCliente} />
+      <Picker
+        selectedValue={cliente}
+        onValueChange={(itemValue) => setCliente(itemValue)}
+        style={styles.input}
+      >
+        <Picker.Item label="Selecione um cliente" value="" />
+        {clientes.map((c) => (
+          <Picker.Item key={c.id} label={c.nome} value={c.nome} />
+        ))}
+      </Picker>
+
 
       <Text>Serviço:</Text>
       <TextInput style={styles.input} value={servico} onChangeText={setServico} />
