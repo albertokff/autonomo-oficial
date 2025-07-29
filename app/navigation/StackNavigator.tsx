@@ -16,6 +16,7 @@ import FeedbackScreen from '../../src/screens/FeedbackScreen';
 import AjudaScreen from '../../src/screens/AjudaScreen';
 import ServiceList from '../../src/screens/ServiceList';
 import AgendaScreen from '../../src/screens/AgendaScreen';
+import DebugScreen from '@/src/screens/DebugScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -37,6 +38,7 @@ export default function StackNavigator() {
       <Stack.Screen name="Feedback" component={FeedbackScreen} options={{ title: 'Feedback' }} />
       <Stack.Screen name="Ajuda" component={AjudaScreen} options={{ title: 'Ajuda' }} />
       <Stack.Screen name="ServiceList" component={ServiceList} options={{ title: 'Serviços' }} />
+      <Stack.Screen name="DebugScreen" component={DebugScreen} options={{ title: 'Debug Tela'}} />
     </Stack.Navigator>
   );
 }

@@ -44,6 +44,7 @@ const extraActions: Action[] = [
   { label: 'Estoque', icon: 'inventory' },
   { label: 'Feedback', icon: 'feedback' },
   { label: 'Ajuda', icon: 'help-outline' },
+  { label: 'Debug', icon: 'settings'}
 ];
 
 async function fetchDashboardData(): Promise<{ agenda: number; atendidos: number; faturamento: number }> {
@@ -203,6 +204,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
           ))}
         </View>
+
       </ScrollView>
 
       {/* Sidebar modal */}
