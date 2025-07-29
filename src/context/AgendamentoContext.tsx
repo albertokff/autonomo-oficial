@@ -7,6 +7,7 @@ export type Agendamento = {
   servico: string;
   data: string;
   horario: string;
+  valor: number
 };
 
 type AgendamentoContextType = {
@@ -36,7 +37,8 @@ export const AgendamentoProvider: React.FC<{ children: React.ReactNode }> = ({ c
     insert('agendamentos', [{name: 'cliente', value: novo.cliente},
                             {name: 'servico', value: novo.servico},
                             {name: 'data', value: novo.data},
-                            {name: 'horario', value: novo.horario},]);
+                            {name: 'horario', value: novo.horario},
+                            {name: 'valor', value: novo.valor}]);
   }
 
   return (

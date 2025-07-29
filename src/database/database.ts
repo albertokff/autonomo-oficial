@@ -71,9 +71,28 @@ export async function addFeitoColumnIfNotExists() {
   }
 }
 
+export async function addValorColumnIfNotExists() {
+  const db = await openDb();
+  try {
+    await db.execAsync('ALTER TABLE agendamentos ADD COLUMN valor REAL DEFAULT 0;');
+  } catch (error: any) {
+    if (
+      error.message.includes('duplicate column') ||
+      error.message.includes('already exists') ||
+      error.message.includes('column "valor" already exists')
+    ) {
+      // Coluna já existe, beleza
+    } else {
+      throw error;
+    }
+  }
+}
+
+
 export async function initDatabase() {
   await createTableAgendamentos();
   await addFeitoColumnIfNotExists();
+  await addValorColumnIfNotExists();
 }
 
 export const getAllAgendamentos = async () => {

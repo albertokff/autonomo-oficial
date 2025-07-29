@@ -86,14 +86,16 @@ export default function HomeScreen() {
           setDashboardCards([
             { label: 'Agenda', value: data.totalMes.toString() },
             { label: 'Atendidos', value: data.feitosMes.toString() },
-            { label: 'Faturamento', value: `R$ ${data.faturamentoTotal.toFixed(2).replace('.', ',')}` },
+            { label: 'Faturamento Total', value: `R$ ${data.faturamentoTotal.toFixed(2).replace('.', ',')}` },
+            { label: 'Faturado (feitos)', value: `R$ ${data.faturado.toFixed(2).replace('.', ',')}` },
           ]);
         } catch (error) {
           console.error('Erro ao carregar dados do dashboard:', error);
         }
       }
       loadDashboard();
-  }, []));
+    }, [])
+  );
 
   const closeSidebar = () => setSidebarVisible(false);
 
@@ -240,18 +242,23 @@ const styles = StyleSheet.create({
   headerTitle: { fontSize: 20, fontWeight: '600', color: '#fff' },
   mainArea: { flex: 1 },
   greeting: { fontSize: 28, fontWeight: '600', marginBottom: 25, color: '#2e7d32' },
-  cardsContainer: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 40 },
-  card: {
-    backgroundColor: '#e9f5e9',
-    flex: 1,
-    marginHorizontal: 5,
-    borderRadius: 12,
-    padding: 15,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
-  },
+  cardsContainer: {
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  justifyContent: 'space-between',
+  marginBottom: 40,
+},
+card: {
+  backgroundColor: '#e9f5e9',
+  width: '48%',
+  marginBottom: 10,
+  borderRadius: 12,
+  padding: 15,
+  shadowColor: '#000',
+  shadowOpacity: 0.1,
+  shadowRadius: 6,
+  elevation: 3,
+},
   cardTitle: { fontSize: 16, fontWeight: '500', color: '#2e7d32' },
   cardValue: { fontSize: 20, fontWeight: '700', color: '#2e7d32' },
   feelingsContainer: { marginBottom: 30 },
