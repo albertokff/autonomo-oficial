@@ -5,6 +5,9 @@ export async function limparDadosDoBanco() {
   const db = await openDb();
   try {
     await db.execAsync('DELETE FROM agendamentos;');
+    await db.execAsync('DELETE FROM clientes;');
+    await db.execAsync('DELETE FROM services;');
+
     console.log('Dados apagados com sucesso.');
   } catch (error) {
     console.error('Erro ao limpar dados:', error);

@@ -2,8 +2,9 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { getAllClientes, saveCliente } from '../database/database';
 
 export type Cliente = {
-  id: string;
   nome: string;
+  telefone: string;
+  email: string;
 };
 
 type ClienteContextType = {

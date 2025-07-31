@@ -1,17 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
-import { createTableServices, insert } from '../database/database';
+import { useServico } from '../context/ServiceContext';
 
 export default function ServiceForm({ navigation }) {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
-
-  useEffect(() => {
-    createTableServices().catch(error => {
-      console.error('Erro ao criar tabela:', error);
-    });
-  }, []);
+  const { addServico } = useServico();
 
   const handleSave = async () => {
     if (!name.trim()) {
@@ -28,12 +23,9 @@ export default function ServiceForm({ navigation }) {
 
   async function newService() {
     try {
-      await insert('services', [
-        {name: 'name', value: name},
-        {name: 'price', value: parseFloat(price)},
-        {name: 'description', value: description}]);
-
+      await addServico({ name: name.trim(), price: parseFloat(price), description: description })
       Alert.alert('Sucesso', 'Serviço salvo com sucesso!');
+      navigation.goBack();
     } catch (error) {
       console.error('Erro ao salvar serviço:', error);
       Alert.alert('Erro', 'Não foi possível salvar o serviço!');

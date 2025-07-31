@@ -38,6 +38,7 @@ export async function insert(table: string, campos: any) {
 export async function getAllServices() {
   const db = await openDb();
   const result = await db.getAllAsync('SELECT * FROM services');
+  console.log(result)
   return result;
 }
 
@@ -184,14 +185,21 @@ export async function createTableClientes() {
   `);
 }
 
-export async function saveCliente(nome: string, telefone?: string, email?: string) {
+export async function saveCliente(cliente: { nome: string; telefone?: string; email?: string }) {
   const db = await openDb();
   await db.runAsync(
     `INSERT INTO clientes (nome, telefone, email) VALUES (?, ?, ?);`,
-    [nome, telefone ?? '', email ?? '']
+    [cliente.nome, cliente.telefone ?? '', cliente.email ?? '']
   );
 }
 
+export async function saveService(servico: { name: string; price: number; description: string }) {
+  const db = await openDb();
+  await db.runAsync(
+    `INSERT INTO services (name, price, description) VALUES (?, ?, ?);`,
+    [servico.name, servico.price, servico.description]
+  );
+}
 
 
 

@@ -1,15 +1,25 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Platform, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+  ScrollView,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAgendamento } from '../context/AgendamentoContext';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import { useCliente } from '../context/ClienteContext';
-
+import { useServico } from '../context/ServiceContext';
 
 export default function AgendamentoForm() {
   const navigation = useNavigation();
   const { addAgendamento } = useAgendamento();
+  const { clientes } = useCliente();
+  const { servicos } = useServico();
 
   const [cliente, setCliente] = useState('');
   const [servico, setServico] = useState('');
@@ -17,7 +27,16 @@ export default function AgendamentoForm() {
   const [horario, setHorario] = useState('');
   const [data, setData] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const { clientes } = useCliente();
+
+  function handleSelecionaServico(nomeSelecionado: string) {
+    setServico(nomeSelecionado);
+
+    const servicoSelecionado = servicos.find((s) => s.name === nomeSelecionado);
+
+    if (servicoSelecionado) {
+      setValor(servicoSelecionado.price.toString());
+    }
+  }
 
   function handleSalvar() {
     if (!cliente || !servico || !valor || !data || !horario) {
@@ -45,24 +64,40 @@ export default function AgendamentoForm() {
   }
 
   return (
-    <View style={styles.container}>
-      <Text>Cliente:</Text>
-      <Picker
-        selectedValue={cliente}
-        onValueChange={(itemValue) => setCliente(itemValue)}
-        style={styles.input}
-      >
-        <Picker.Item label="Selecione um cliente" value="" />
-        {clientes.map((c) => (
-          <Picker.Item key={c.id} label={c.nome} value={c.nome} />
-        ))}
-      </Picker>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>Novo Agendamento</Text>
+
+      <Text style={styles.label}>Cliente:</Text>
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={cliente}
+          onValueChange={setCliente}
+          style={styles.picker}
+        >
+          <Picker.Item label="Selecione um cliente" value="" />
+          {clientes.map((c) => (
+            <Picker.Item key={c.id} label={c.nome} value={c.nome} />
+          ))}
+        </Picker>
+      </View>
+
+      <Text style={styles.label}>Serviço:</Text>
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={servico}
+          onValueChange={(value) => handleSelecionaServico(value)}
+          style={styles.picker}
+        >
+          <Picker.Item label="Selecione um serviço" value="" />
+          {servicos.map((s, index) => (
+            <Picker.Item key={index} label={s.name} value={s.name} />
+          ))}
+        </Picker>
+      </View>
 
 
-      <Text>Serviço:</Text>
-      <TextInput style={styles.input} value={servico} onChangeText={setServico} />
 
-      <Text>Valor (R$):</Text>
+      <Text style={styles.label}>Valor (R$):</Text>
       <TextInput
         style={styles.input}
         value={valor}
@@ -71,9 +106,12 @@ export default function AgendamentoForm() {
         placeholder="Ex: 100.00"
       />
 
-      <Text>Data:</Text>
-      <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.input}>
-        <Text>{data.toLocaleDateString('pt-BR').split('T')[0]}</Text>
+      <Text style={styles.label}>Data:</Text>
+      <TouchableOpacity
+        onPress={() => setShowDatePicker(true)}
+        style={styles.input}
+      >
+        <Text>{data.toLocaleDateString('pt-BR')}</Text>
       </TouchableOpacity>
 
       {showDatePicker && (
@@ -88,7 +126,7 @@ export default function AgendamentoForm() {
         />
       )}
 
-      <Text>Horário (HH:mm):</Text>
+      <Text style={styles.label}>Horário (HH:mm):</Text>
       <TextInput
         style={styles.input}
         value={horario}
@@ -96,19 +134,62 @@ export default function AgendamentoForm() {
         placeholder="Ex: 14:30"
       />
 
-      <Button title="Salvar Agendamento" onPress={handleSalvar} />
-    </View>
+      <TouchableOpacity style={styles.button} onPress={handleSalvar}>
+        <Text style={styles.buttonText}>Salvar Agendamento</Text>
+      </TouchableOpacity>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
+  container: {
+    padding: 20,
+    paddingBottom: 40,
+    backgroundColor: '#fff',
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: '600',
+    marginBottom: 20,
+    textAlign: 'center',
+    color: '#333',
+  },
+  label: {
+    fontWeight: '500',
+    marginBottom: 5,
+    color: '#555',
+  },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#bbb',
+    borderRadius: 8,
+    padding: 12,
     marginBottom: 15,
-    padding: 10,
-    borderRadius: 4,
-    justifyContent: 'center',
+    backgroundColor: '#f9f9f9',
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#bbb',
+    borderRadius: 8,
+    marginBottom: 15,
+    overflow: 'hidden',
+    backgroundColor: '#f9f9f9',
+  },
+  picker: {
+    height: 50,
+    width: '100%',
+  },
+  button: {
+    backgroundColor: '#2e7d32',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+    elevation: 2,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
   },
 });

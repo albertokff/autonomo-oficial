@@ -25,7 +25,7 @@ export default function ClientForm({ navigation }) {
     }
 
     try {
-      await addCliente(name.trim(), phone.trim(), email.trim());
+      await addCliente({ nome: name.trim(), telefone: phone.trim(), email: email.trim() });
       Alert.alert('Sucesso', `Cliente ${name} cadastrado com sucesso!`);
       navigation.goBack();
 
