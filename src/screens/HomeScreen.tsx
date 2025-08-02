@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { getResumoMensal } from '../database/database';
+import { getResumoMensal } from '../database/agendamentosFIrebase';
 
 const { width } = Dimensions.get('window');
 

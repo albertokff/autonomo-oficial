@@ -9,15 +9,15 @@ import {
   ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useAgendamento } from '../context/AgendamentoContext';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
+
 import { useCliente } from '../context/ClienteContext';
 import { useServico } from '../context/ServiceContext';
+import { saveAgendamento } from '../database/agendamentosFIrebase'; // 🔸 Importação nova
 
 export default function AgendamentoForm() {
   const navigation = useNavigation();
-  const { addAgendamento } = useAgendamento();
   const { clientes } = useCliente();
   const { servicos } = useServico();
 
@@ -32,13 +32,12 @@ export default function AgendamentoForm() {
     setServico(nomeSelecionado);
 
     const servicoSelecionado = servicos.find((s) => s.name === nomeSelecionado);
-
     if (servicoSelecionado) {
       setValor(servicoSelecionado.price.toString());
     }
   }
 
-  function handleSalvar() {
+  async function handleSalvar() {
     if (!cliente || !servico || !valor || !data || !horario) {
       alert('Preencha todos os campos');
       return;
@@ -52,15 +51,21 @@ export default function AgendamentoForm() {
 
     const dataFormatada = data.toISOString().split('T')[0]; // YYYY-MM-DD
 
-    addAgendamento({
-      cliente,
-      servico,
-      valor: valorNumerico,
-      data: dataFormatada,
-      horario,
-    });
+    try {
+      await saveAgendamento({
+        cliente,
+        servico,
+        valor: valorNumerico,
+        data: dataFormatada,
+        horario,
+        feito: false,
+      });
 
-    navigation.goBack();
+      navigation.goBack();
+    } catch (error) {
+      console.error('Erro ao salvar agendamento:', error);
+      alert('Erro ao salvar. Tente novamente.');
+    }
   }
 
   return (
@@ -85,7 +90,7 @@ export default function AgendamentoForm() {
       <View style={styles.pickerContainer}>
         <Picker
           selectedValue={servico}
-          onValueChange={(value) => handleSelecionaServico(value)}
+          onValueChange={handleSelecionaServico}
           style={styles.picker}
         >
           <Picker.Item label="Selecione um serviço" value="" />
@@ -94,8 +99,6 @@ export default function AgendamentoForm() {
           ))}
         </Picker>
       </View>
-
-
 
       <Text style={styles.label}>Valor (R$):</Text>
       <TextInput

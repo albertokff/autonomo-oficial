@@ -3,7 +3,7 @@ import { View, Text, FlatList, TouchableOpacity, StyleSheet, ListRenderItem, Mod
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, NavigationProp, useIsFocused } from '@react-navigation/native';
-import { getAllAgendamentos, deleteAgendamento, marcarAgendamentoComoFeito } from '../database/database';
+import { getAllAgendamentos, deleteAgendamento, marcarAgendamentoComoFeito } from '../database/agendamentosFIrebase';
 
 type RootStackParamList = {
   AgendamentoForm: undefined;
