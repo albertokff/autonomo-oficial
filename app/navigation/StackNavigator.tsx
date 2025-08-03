@@ -17,6 +17,8 @@ import AjudaScreen from '../../src/screens/AjudaScreen';
 import ServiceList from '../../src/screens/ServiceList';
 import AgendaScreen from '../../src/screens/AgendaScreen';
 import DebugScreen from '@/src/screens/DebugScreen';
+import ServiceReport from '@/src/screens/ServiceReport';
+import ClientList from '@/src/screens/ClientLIst';
 
 const Stack = createNativeStackNavigator();
 
@@ -39,6 +41,8 @@ export default function StackNavigator() {
       <Stack.Screen name="Ajuda" component={AjudaScreen} options={{ title: 'Ajuda' }} />
       <Stack.Screen name="ServiceList" component={ServiceList} options={{ title: 'Serviços' }} />
       <Stack.Screen name="DebugScreen" component={DebugScreen} options={{ title: 'Debug Tela'}} />
+      <Stack.Screen name="ServiceReport" component={ServiceReport} options={{ title: 'Serviços'}} />
+      <Stack.Screen name="ClientList" component={ClientList} options={{ title: 'Clientes'}} />
     </Stack.Navigator>
   );
 }

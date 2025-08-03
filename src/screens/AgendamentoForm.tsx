@@ -118,7 +118,7 @@ export default function AgendamentoForm() {
         >
           <Picker.Item label="Selecione um serviço" value="" color="#000" />
           {servicos.map((s, index) => (
-            <Picker.Item key={index} label={s.name} value={s.name} color="#000" />
+            <Picker.Item key={index} label={s.name} value={s.name} />
           ))}
         </Picker>
       </View>

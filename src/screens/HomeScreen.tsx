@@ -28,9 +28,9 @@ const feelings: Feeling[] = [
 ];
 
 const mainActions: Action[] = [
-  { label: 'Novo Serviço', icon: 'add-box' },
-  { label: 'Novo Cliente', icon: 'person-add' },
-  { label: 'Pendências', icon: 'error-outline' },
+  { label: 'Serviços', icon: 'build' },         // ícone de ferramentas, representa bem serviços
+  { label: 'Clientes', icon: 'groups' },        // ícone de grupo de pessoas
+  { label: 'Pendências', icon: 'pending-actions' }, // continua ótimo e bem específico
 ];
 
 const extraActions: Action[] = [
@@ -112,17 +112,6 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => setSidebarVisible(true)}
-          style={styles.menuButton}
-          accessibilityLabel="Abrir menu lateral"
-        >
-          <Text style={styles.menuText}>☰</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Dashboard</Text>
-      </View>
 
       {/* Conteúdo principal */}
       <ScrollView style={styles.mainArea} contentContainerStyle={{ padding: 20 }}>
@@ -166,11 +155,11 @@ export default function HomeScreen() {
               style={styles.actionCard}
               onPress={() => {
                 switch (action.label) {
-                  case 'Novo Serviço':
-                    navigation.navigate('ServiceForm');
+                  case 'Serviços':
+                    navigation.navigate('ServiceReport');
                     break;
-                  case 'Novo Cliente':
-                    navigation.navigate('ClientForm');
+                  case 'Clientes':
+                    navigation.navigate('ClientList');
                     break;
                   case 'Pendências':
                     navigation.navigate('PendenciasScreen');

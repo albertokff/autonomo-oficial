@@ -1,5 +1,6 @@
 import * as SQLite from 'expo-sqlite';
-import { Agendamento } from '../context/AgendamentoContext';
+import { doc, deleteDoc } from 'firebase/firestore';
+import { db } from '@/firebase';
 
 let dbPromise;
 
@@ -201,5 +202,6 @@ export async function saveService(servico: { name: string; price: number; descri
   );
 }
 
-
-
+export async function deleteService(id: string): Promise<void> {
+  await deleteDoc(doc(db, 'services', id));
+} 
