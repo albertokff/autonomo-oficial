@@ -32,7 +32,7 @@ export default function StackNavigator() {
       <Stack.Screen name="ClientForm" component={ClientForm} options={{ title: 'Novo Cliente' }} />
       <Stack.Screen name="AgendamentoForm" component={AgendamentoForm} options={{ title: 'Novo Agendamento' }} />
       <Stack.Screen name="Pendencias" component={PendenciasScreen} options={{ title: 'Pendências' }} />
-      <Stack.Screen name="Relatorio" component={RelatorioScreen} options={{ title: 'Relatório' }} />
+      <Stack.Screen name="RelatorioScreen" component={RelatorioScreen} options={{ title: 'Relatório' }} />
       <Stack.Screen name="Financeiro" component={FinanceiroScreen} options={{ title: 'Financeiro' }} />
       <Stack.Screen name="Mensagem" component={MensagemScreen} options={{ title: 'Mensagens' }} />
       <Stack.Screen name="Notificacao" component={NotificacaoScreen} options={{ title: 'Notificações' }} />

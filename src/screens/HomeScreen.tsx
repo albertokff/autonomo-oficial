@@ -35,7 +35,7 @@ const mainActions: Action[] = [
 
 const extraActions: Action[] = [
   { label: 'Agenda', icon: 'event' },
-  { label: 'Relatórios', icon: 'bar-chart' },
+  { label: 'Relatorio', icon: 'bar-chart' },
   { label: 'Financeiro', icon: 'attach-money' },
   { label: 'Mensagem', icon: 'message' },
   { label: 'Configurações', icon: 'settings' },

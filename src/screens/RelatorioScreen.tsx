@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,18 +7,45 @@ import {
   TouchableOpacity,
   FlatList,
 } from 'react-native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RouteProp } from '@react-navigation/native';
+import { getResumoMensalFromFirebase, getAgendamentosFeitos } from '../database/database';
 
-export default function RelatorioScreen({ navigation }) {
-  // Mock de dados
-  const resumo = {
-    totalAgendamentos: 28,
-    totalServicos: 25,
-    faturamento: 1500.00,
-    mediaPorDia: 2.5,
-    servicoMaisRealizado: 'Corte de Cabelo',
-  };
+// Ajuste de acordo com sua estrutura de rotas
+type RootStackParamList = {
+  RelatorioScreen: undefined;
+  ServiceList: undefined;
+};
 
-  const relatoriosDetalhados = [
+type Props = {
+  navigation: NativeStackNavigationProp<RootStackParamList, 'RelatorioScreen'>;
+  route: RouteProp<RootStackParamList, 'RelatorioScreen'>;
+};
+
+type Resumo = {
+  totalAgendamentos: number;
+  totalServicos: number;
+  faturamento: number;
+  mediaPorDia: number;
+  servicoMaisRealizado: string;
+};
+
+type RelatorioDetalhado = {
+  id: string;
+  titulo: string;
+  descricao: string;
+};
+
+export default function RelatorioScreen({ navigation }: Props) {
+  const [resumo, setResumo] = useState<Resumo>({
+    totalAgendamentos: 0,
+    totalServicos: 0,
+    faturamento: 0,
+    mediaPorDia: 0,
+    servicoMaisRealizado: '',
+  });
+
+  const relatoriosDetalhados: RelatorioDetalhado[] = [
     { id: '1', titulo: 'Agendamentos por período', descricao: 'Veja todos os agendamentos por data' },
     { id: '2', titulo: 'Faturamento por período', descricao: 'Visualize quanto você faturou em determinado período' },
     { id: '3', titulo: 'Serviços por período', descricao: 'Confira quais serviços foram cadastrados' },
@@ -27,11 +54,71 @@ export default function RelatorioScreen({ navigation }) {
     { id: '6', titulo: 'Horários mais movimentados', descricao: 'Descubra os horários de pico' },
   ];
 
-  const handleDetalheRelatorio = (titulo) => {
+  const handleDetalheRelatorio = (titulo: string) => {
     if (titulo === 'Serviços por período') {
-        navigation.navigate('ServiceList')
+      navigation.navigate('ServiceList');
     }
   };
+
+  const aplicarFiltro = async (periodo: '7dias' | 'mes' | 'personalizado') => {
+    const hoje = new Date();
+    const ultimoDiaDoMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+
+    let inicio: Date, fim: Date;
+
+    switch (periodo) {
+      case '7dias':
+        fim = hoje;
+        inicio = new Date();
+        inicio.setDate(hoje.getDate() - 6);
+        break;
+      case 'mes':
+        inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+        fim = ultimoDiaDoMes;
+        break;
+      case 'personalizado':
+        inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 10);
+        fim = hoje;
+        break;
+    }
+
+    const inicioStr = inicio.toISOString().slice(0, 10);
+    const fimStr = fim.toISOString().slice(0, 10);
+
+    const resumo = await getResumoMensalFromFirebase(inicioStr, fimStr);
+    const agendamentosFeitos = await getAgendamentosFeitos(inicioStr, fimStr);
+
+    const diasComServico = new Set<string>();
+    agendamentosFeitos.forEach(item => {
+      const dia = item.data.split('T')[0]; // normaliza a data para yyyy-mm-dd
+      diasComServico.add(dia);
+    });
+
+    const numeroDiasComServico = diasComServico.size;
+
+    const mediaPorDia = numeroDiasComServico > 0
+      ? Math.round((resumo.faturamentoTotal / 30) * 10) / 10
+      : 0;
+
+    setResumo({
+      totalAgendamentos: resumo.totalMes,
+      totalServicos: resumo.feitosMes,
+      faturamento: resumo.faturamentoTotal,
+      mediaPorDia,
+      servicoMaisRealizado: resumo.servicoMaisRealizado,
+    });
+  };
+
+
+
+
+
+
+
+  useEffect(() => {
+    aplicarFiltro('mes'); // filtro padrão para carregar dados do mês atual
+  }, []);
+
 
   return (
     <ScrollView style={styles.container}>
@@ -53,7 +140,7 @@ export default function RelatorioScreen({ navigation }) {
           <Text style={styles.cardLabel}>Faturamento</Text>
         </View>
         <View style={styles.card}>
-          <Text style={styles.cardNumero}>{resumo.mediaPorDia}</Text>
+          <Text style={styles.cardNumero}>R$ {resumo.mediaPorDia.toFixed(2)}</Text>
           <Text style={styles.cardLabel}>Média por dia</Text>
         </View>
         <View style={styles.card}>
@@ -65,15 +152,16 @@ export default function RelatorioScreen({ navigation }) {
       {/* Filtros rápidos */}
       <Text style={styles.sectionTitle}>Filtros rápidos</Text>
       <View style={styles.filtrosContainer}>
-        <TouchableOpacity style={styles.filtroButton}>
+        <TouchableOpacity style={styles.filtroButton} onPress={() => aplicarFiltro('7dias')}>
           <Text style={styles.filtroText}>Últimos 7 dias</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.filtroButton}>
+        <TouchableOpacity style={styles.filtroButton} onPress={() => aplicarFiltro('mes')}>
           <Text style={styles.filtroText}>Este mês</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.filtroButton}>
+        <TouchableOpacity style={styles.filtroButton} onPress={() => aplicarFiltro('personalizado')}>
           <Text style={styles.filtroText}>Personalizado</Text>
         </TouchableOpacity>
+
       </View>
 
       {/* Lista de relatórios detalhados */}

@@ -1,5 +1,5 @@
 import * as SQLite from 'expo-sqlite';
-import { doc, deleteDoc } from 'firebase/firestore';
+import { doc, deleteDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/firebase';
 
 let dbPromise;
@@ -205,3 +205,92 @@ export async function saveService(servico: { name: string; price: number; descri
 export async function deleteService(id: string): Promise<void> {
   await deleteDoc(doc(db, 'services', id));
 } 
+
+export const getResumoMensalFromFirebase = async (inicio?: string, fim?: string) => {
+  try {
+    const snapshot = await getDocs(collection(db, 'agendamentos'));
+
+    const dados = snapshot.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
+      .filter(item => {
+        if (!inicio || !fim) return true;
+        const data = item.data; // formato 'YYYY-MM-DD'
+        const dentroDoPeriodo = data >= inicio && data <= fim;
+        if (!dentroDoPeriodo) {
+          console.log(`[Filtro] Ignorando agendamento fora do período: id=${item.id}, data=${data}`);
+        }
+        return dentroDoPeriodo;
+      });
+
+    // Log dos dados para depurar o campo 'feito'
+    dados.forEach(item => {
+      console.log(`[Status] id=${item.id}, feito=${item.feito}`);
+    });
+
+    // Filtra agendamentos feitos
+    const feitosMes = dados.filter(item => item.feito === true || item.feito === 'true');
+
+    console.log('[Resumo] Total agendamentos feitos:', feitosMes.length);
+
+    // Calcula faturamento total, somando o valor ou 0 caso esteja indefinido
+    const faturado = feitosMes.reduce((acc, curr) => acc + (curr.valor || 0), 0);
+
+    console.log('[Resumo] Faturamento total: R$', faturado.toFixed(2));
+
+    // Conta quantas vezes cada serviço foi realizado
+    const servicos: Record<string, number> = {};
+    feitosMes.forEach((item) => {
+      const nomeServico = item.servico || 'Serviço desconhecido';
+      if (!servicos[nomeServico]) servicos[nomeServico] = 0;
+      servicos[nomeServico]++;
+    });
+
+    console.log('[Resumo] Contagem de serviços realizados:', servicos);
+
+    // Pega o serviço mais realizado, ordenando pelo número de ocorrências
+    const servicoMaisRealizado = Object.entries(servicos)
+      .sort((a, b) => b[1] - a[1])[0]?.[0] || '';
+
+    console.log('[Resumo] Serviço mais realizado:', servicoMaisRealizado);
+
+    return {
+      totalMes: dados.length,
+      feitosMes: feitosMes.length,
+      faturado,
+      faturamentoTotal: faturado,
+      servicoMaisRealizado,
+    };
+  } catch (error) {
+    console.error('Erro ao buscar resumo:', error);
+    return {
+      totalMes: 0,
+      feitosMes: 0,
+      faturado: 0,
+      faturamentoTotal: 0,
+      servicoMaisRealizado: '',
+    };
+  }
+};
+
+export const getAgendamentosFeitos = async (inicio: string, fim: string) => {
+  try {
+    const agendamentosRef = collection(db, 'agendamentos');
+
+    // Montar query com filtros: feito === true e data entre inicio e fim
+    const q = query(
+      agendamentosRef,
+      where('feito', '==', true),
+      where('data', '>=', inicio),
+      where('data', '<=', fim)
+    );
+
+    const snapshot = await getDocs(q);
+
+    const dados = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+    return dados;
+  } catch (error) {
+    console.error('Erro ao buscar agendamentos feitos:', error);
+    return [];
+  }
+};
