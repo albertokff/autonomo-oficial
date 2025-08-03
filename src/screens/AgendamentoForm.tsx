@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -12,21 +11,44 @@ import { useNavigation } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 
-import { useCliente } from '../context/ClienteContext';
-import { useServico } from '../context/ServiceContext';
+import { getAllClientes } from '../database/clientesFIrebase';
 import { saveAgendamento } from '../database/agendamentosFIrebase'; // 🔸 Importação nova
+import { getAllServices } from '../database/servicesFirebase';
+import React, { useState, useEffect } from 'react';
+import { Cliente } from '../database/clientesFIrebase';
 
 export default function AgendamentoForm() {
-  const navigation = useNavigation();
-  const { clientes } = useCliente();
-  const { servicos } = useServico();
+  type Service = {
+    name: string;
+    price: number;
+    // outras propriedades, se houver
+  };
 
-  const [cliente, setCliente] = useState('');
+  const navigation = useNavigation();
+
+  const [cliente, setCliente] = useState<Cliente[]>([]);
+  const [clienteSelecionado, setClienteSelecionado] = useState<string>('');
+  const [servicos, setServicos] = useState<Service[]>([]);
   const [servico, setServico] = useState('');
   const [valor, setValor] = useState('');
   const [horario, setHorario] = useState('');
   const [data, setData] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+
+  useEffect(() => {
+    async function fetchServicos() {
+      const listaServicos = await getAllServices();
+      setServicos(listaServicos);
+    }
+
+    async function fetchClientes() {
+      const listaClientes = await getAllClientes();
+      setCliente(listaClientes);
+    }
+
+    fetchServicos();
+    fetchClientes();
+  }, []);
 
   function handleSelecionaServico(nomeSelecionado: string) {
     setServico(nomeSelecionado);
@@ -53,7 +75,7 @@ export default function AgendamentoForm() {
 
     try {
       await saveAgendamento({
-        cliente,
+        clienteSelecionado,
         servico,
         valor: valorNumerico,
         data: dataFormatada,
@@ -75,15 +97,16 @@ export default function AgendamentoForm() {
       <Text style={styles.label}>Cliente:</Text>
       <View style={styles.pickerContainer}>
         <Picker
-          selectedValue={cliente}
-          onValueChange={setCliente}
+          selectedValue={clienteSelecionado}
+          onValueChange={setClienteSelecionado}
           style={styles.picker}
         >
-          <Picker.Item label="Selecione um cliente" value="" />
-          {clientes.map((c) => (
+          <Picker.Item label="Selecione um cliente" value="" color="#000" />
+          {cliente.map((c) => (
             <Picker.Item key={c.id} label={c.nome} value={c.nome} />
           ))}
         </Picker>
+
       </View>
 
       <Text style={styles.label}>Serviço:</Text>
@@ -93,9 +116,9 @@ export default function AgendamentoForm() {
           onValueChange={handleSelecionaServico}
           style={styles.picker}
         >
-          <Picker.Item label="Selecione um serviço" value="" />
+          <Picker.Item label="Selecione um serviço" value="" color="#000" />
           {servicos.map((s, index) => (
-            <Picker.Item key={index} label={s.name} value={s.name} />
+            <Picker.Item key={index} label={s.name} value={s.name} color="#000" />
           ))}
         </Picker>
       </View>

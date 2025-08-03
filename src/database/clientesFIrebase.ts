@@ -1,6 +1,6 @@
 // clientesFirebase.ts
 import { collection, addDoc, getDocs, doc, deleteDoc } from 'firebase/firestore';
-import { db } from './firebase';
+import { db } from '../../firebase';
 
 export type Cliente = {
   id?: string;

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  View,
   Text,
   TextInput,
   TouchableOpacity,
@@ -10,13 +9,12 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
-import { useCliente } from '../context/ClienteContext';
+import { saveCliente } from '../database/clientesFIrebase'; // ajuste o caminho se necessário
 
 export default function ClientForm({ navigation }) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
-  const { addCliente } = useCliente()
 
   const handleSave = async () => {
     if (!name.trim()) {
@@ -25,23 +23,21 @@ export default function ClientForm({ navigation }) {
     }
 
     try {
-      await addCliente({ nome: name.trim(), telefone: phone.trim(), email: email.trim() });
+      await saveCliente({ nome: name.trim(), telefone: phone.trim(), email: email.trim() });
       Alert.alert('Sucesso', `Cliente ${name} cadastrado com sucesso!`);
       navigation.goBack();
-
     } catch (error) {
       console.error('Erro ao salvar cliente:', error);
       Alert.alert('Erro', 'Não foi possível salvar o cliente.');
     }
   };
 
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
-      <ScrollView contentContainerStyle={styles.contentContainer}>
+      <ScrollView contentContainerStyle={styles.contentContainer} keyboardShouldPersistTaps="handled">
         <Text style={styles.title}>Novo Cliente</Text>
 
         <Text style={styles.label}>Nome</Text>

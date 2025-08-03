@@ -11,7 +11,7 @@ import { db } from '../../firebase';
 
 export type Agendamento = {
   id?: string;
-  cliente: string;
+  clienteSelecionado: string;
   servico: string;
   data: string;      // formato: YYYY-MM-DD
   horario: string;   // formato: HH:mm

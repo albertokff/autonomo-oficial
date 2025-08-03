@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
-import { useServico } from '../context/ServiceContext';
+import { saveService } from '../database/servicesFirebase'; // <- novo import
 
 export default function ServiceForm({ navigation }) {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
-  const { addServico } = useServico();
 
   const handleSave = async () => {
     if (!name.trim()) {
@@ -18,19 +17,19 @@ export default function ServiceForm({ navigation }) {
       return;
     }
 
-    newService();
-  };
-
-  async function newService() {
     try {
-      await addServico({ name: name.trim(), price: parseFloat(price), description: description })
+      await saveService({
+        name: name.trim(),
+        price: parseFloat(price),
+        description: description.trim(),
+      });
       Alert.alert('Sucesso', 'Serviço salvo com sucesso!');
       navigation.goBack();
     } catch (error) {
       console.error('Erro ao salvar serviço:', error);
       Alert.alert('Erro', 'Não foi possível salvar o serviço!');
     }
-  }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -128,4 +127,3 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-

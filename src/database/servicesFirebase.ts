@@ -1,6 +1,5 @@
-// servicesFirebase.ts
 import { collection, addDoc, getDocs, doc, deleteDoc } from 'firebase/firestore';
-import { db } from 'firebase';
+import { db } from '../../firebase';  // ajuste o caminho conforme seu projeto
 
 export type Service = {
   id?: string;

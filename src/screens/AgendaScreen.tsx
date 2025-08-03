@@ -3,19 +3,10 @@ import { View, Text, FlatList, TouchableOpacity, StyleSheet, ListRenderItem, Mod
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, NavigationProp, useIsFocused } from '@react-navigation/native';
-import { getAllAgendamentos, deleteAgendamento, marcarAgendamentoComoFeito } from '../database/agendamentosFIrebase';
+import { getAllAgendamentos, deleteAgendamento, marcarAgendamentoComoFeito, Agendamento } from '../database/agendamentosFIrebase';
 
 type RootStackParamList = {
   AgendamentoForm: undefined;
-};
-
-type Agendamento = {
-  id: string;
-  cliente: string;
-  servico: string;
-  horario: string;
-  data: string;
-  feito?: boolean;
 };
 
 LocaleConfig.locales['pt'] = {
@@ -110,7 +101,7 @@ export default function AgendaScreen() {
     const agendamentoView = (
       <View style={[styles.agendamentoItem, item.feito && styles.agendamentoFeito]}>
         <Text style={[styles.agendamentoText, item.feito && styles.textoFeito]}>
-          {item.horario} - {item.cliente} ({item.servico}) {item.feito ? '✓' : ''}
+          {item.horario} - {item.clienteSelecionado} ({item.servico}) {item.feito ? '✓' : ''} | R$ {item.valor}
         </Text>
       </View>
     );
