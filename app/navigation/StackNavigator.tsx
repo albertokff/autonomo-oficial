@@ -43,6 +43,7 @@ export default function StackNavigator() {
       <Stack.Screen name="DebugScreen" component={DebugScreen} options={{ title: 'Debug Tela'}} />
       <Stack.Screen name="ServiceReport" component={ServiceReport} options={{ title: 'Serviços'}} />
       <Stack.Screen name="ClientList" component={ClientList} options={{ title: 'Clientes'}} />
+      <Stack.Screen name="PendenciasScreen" component={PendenciasScreen} options={{ title: 'Pendências'}} />
     </Stack.Navigator>
   );
 }
