@@ -19,6 +19,10 @@ import AgendaScreen from '../../src/screens/AgendaScreen';
 import DebugScreen from '@/src/screens/DebugScreen';
 import ServiceReport from '@/src/screens/ServiceReport';
 import ClientList from '@/src/screens/ClientLIst';
+import AgendamentosPorMesScreen from '@/src/screens/AgendamentosPorMesScreen';
+import FaturamentoPorMesScreen from '@/src/screens/FaturamentoPorMesScreen';
+import RelatorioServicosScreen from '@/src/screens/RelatorioServicosScreen';
+import RelatorioClientesScreen from '@/src/screens/RelatorioClientesScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -44,6 +48,10 @@ export default function StackNavigator() {
       <Stack.Screen name="ServiceReport" component={ServiceReport} options={{ title: 'Serviços'}} />
       <Stack.Screen name="ClientList" component={ClientList} options={{ title: 'Clientes'}} />
       <Stack.Screen name="PendenciasScreen" component={PendenciasScreen} options={{ title: 'Pendências'}} />
+      <Stack.Screen name="AgendamentosPorMesScreen" component={AgendamentosPorMesScreen} options={{ title: 'Agendamentos Por Mês'}} />
+      <Stack.Screen name="FaturamentoPorMesScreen" component={FaturamentoPorMesScreen} options={{ title: 'Faturamento Por Mês'}} />
+      <Stack.Screen name="RelatorioServicosScreen" component={RelatorioServicosScreen} options={{ title: 'Serviços Mais Realizados'}} />
+      <Stack.Screen name="RelatorioClientesScreen" component={RelatorioClientesScreen} options={{ title: 'Clientes Mais Assíduos'}} />
     </Stack.Navigator>
   );
 }

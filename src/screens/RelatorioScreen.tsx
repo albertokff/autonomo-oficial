@@ -15,6 +15,10 @@ import { getResumoMensalFromFirebase, getAgendamentosFeitos } from '../database/
 type RootStackParamList = {
   RelatorioScreen: undefined;
   ServiceList: undefined;
+  AgendamentosPorMesScreen: undefined;
+  FaturamentoPorMesScreen: undefined;
+  RelatorioServicosScreen: undefined;
+  RelatorioClientesScreen: undefined;
 };
 
 type Props = {
@@ -46,17 +50,28 @@ export default function RelatorioScreen({ navigation }: Props) {
   });
 
   const relatoriosDetalhados: RelatorioDetalhado[] = [
-    { id: '1', titulo: 'Agendamentos por período', descricao: 'Veja todos os agendamentos por data' },
-    { id: '2', titulo: 'Faturamento por período', descricao: 'Visualize quanto você faturou em determinado período' },
-    { id: '3', titulo: 'Serviços por período', descricao: 'Confira quais serviços foram cadastrados' },
-    { id: '4', titulo: 'Serviços mais realizados', descricao: 'Confira quais serviços são mais populares' },
-    { id: '5', titulo: 'Clientes mais frequentes', descricao: 'Identifique seus clientes mais assíduos' },
+    { id: '1', titulo: 'Agendamentos Por Mês', descricao: 'Veja todos os agendamentos por data' },
+    { id: '2', titulo: 'Faturamento Por Mês', descricao: 'Visualize quanto você faturou em determinado período' },
+    { id: '4', titulo: 'Serviços Mais Realizados', descricao: 'Confira quais serviços são mais populares' },
+    { id: '5', titulo: 'Clientes Mais Assíduos', descricao: 'Identifique seus clientes mais assíduos' },
     { id: '6', titulo: 'Horários mais movimentados', descricao: 'Descubra os horários de pico' },
   ];
 
   const handleDetalheRelatorio = (titulo: string) => {
-    if (titulo === 'Serviços por período') {
-      navigation.navigate('ServiceList');
+    if (titulo === 'Agendamentos Por Mês') {
+      navigation.navigate('AgendamentosPorMesScreen');
+    }
+
+    if (titulo == 'Faturamento Por Mês') {
+      navigation.navigate('FaturamentoPorMesScreen')
+    }
+
+    if (titulo == 'Serviços Mais Realizados') {
+      navigation.navigate('RelatorioServicosScreen')
+    }
+
+    if (titulo == 'Clientes Mais Assíduos') {
+      navigation.navigate('RelatorioClientesScreen')
     }
   };
 
